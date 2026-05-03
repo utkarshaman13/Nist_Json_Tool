@@ -156,7 +156,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 **Aman Kumar**
 - GitHub: [@utkarshaman13](https://github.com/utkarshaman13)
-- Instagram: [@aman.xploits](https://instagram.com/aman.xploits)
 
 **Tarun Kumar**
 - GitHub: https://github.com/Tarun30007
