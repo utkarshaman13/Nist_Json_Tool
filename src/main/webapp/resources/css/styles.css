@@ -1,0 +1,95 @@
+/* === Global Styling === */
+body {
+    background-color: #f4f6f9;
+    color: #333;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+/* === Panel and Fieldset Customization === */
+.ui-panel, .ui-fieldset {
+    margin-bottom: 2rem;
+    border-radius: 8px;
+}
+
+/* === Buttons === */
+.ui-button {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.ui-button-success {
+    background-color: #28a745;
+    border: none;
+    color: white;
+}
+
+.ui-button-success:hover {
+    background-color: #218838;
+}
+
+.ui-button-secondary {
+    background-color: #6c757d;
+    border: none;
+    color: white;
+}
+
+.ui-button-secondary:hover {
+    background-color: #5a6268;
+}
+
+.ui-button-info {
+    background-color: #17a2b8;
+    border: none;
+    color: white;
+}
+
+.ui-button-info:hover {
+    background-color: #138496;
+}
+
+/* === Input Styling === */
+.ui-inputtext {
+    border-radius: 4px;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.ui-fileupload-buttonbar {
+    background-color: #f1f1f1;
+    border: none;
+    border-radius: 6px;
+}
+
+.ui-fileupload-choose {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+}
+
+.ui-fileupload-choose:hover {
+    background-color: #0069d9;
+}
+
+/* === Log Textarea === */
+#nistForm\\:logArea {
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #444;
+    border-radius: 6px;
+    padding: 0.5rem;
+}

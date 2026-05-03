@@ -1,0 +1,5 @@
+VAR#>mvn javadoc:javadoc
+EXPRESSION#>exit
+EXPRESSION#>exit;
+EXPRESSION#>q
+EXPRESSION#>quit

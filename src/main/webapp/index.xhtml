@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+    <h:head>
+        <title>#{msg['title']}</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+
+    <h:body style="margin: 2rem; font-family: 'Segoe UI', sans-serif;">
+
+        <!-- Establece el locale actual -->
+        <f:view locale="#{localeBean.locale}" />
+
+        <!-- Carga el bundle de mensajes -->
+        <f:loadBundle basename="messages" var="msg"/>
+
+        <h:form id="nistForm" enctype="multipart/form-data">
+
+            <p:growl id="growl" showDetail="true" sticky="false" life="4000"/>
+
+            <!-- Panel de cabecera con selector de idioma alineado -->
+            <p:panel styleClass="card">
+                <f:facet name="header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>#{msg['form.header']}</span>
+                        <p:selectOneMenu value="#{localeBean.language}" style="width:150px;" onchange="submit()">
+                            <f:selectItem itemLabel="English" itemValue="en" />
+                            <f:selectItem itemLabel="Español" itemValue="es" />
+                            <f:selectItem itemLabel="Français" itemValue="fr" />
+                            <f:selectItem itemLabel="Português" itemValue="pt" />
+                            <f:selectItem itemLabel="Deutsch" itemValue="de" />
+                        </p:selectOneMenu>
+                    </div>
+                </f:facet>
+
+                <!-- Parámetros -->
+                <p:fieldset legend="#{msg['input.params']}">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-fluid"
+                                 columnClasses="ui-g-12 ui-md-3, ui-g-12 ui-md-9">
+
+                        <p:outputLabel for="startYear" value="#{msg['input.startYear']}"/>
+                        <p:inputText id="startYear" value="#{jsonProcessorBean.startYearStr}" placeholder="Ej: 2020">
+                            <p:ajax event="change" update="startYear texto" process="@this"/>
+                        </p:inputText>
+
+                        <p:outputLabel for="endYear" value="#{msg['input.endYear']}"/>
+                        <p:inputText id="endYear" value="#{jsonProcessorBean.endYearStr}" placeholder="Ej: 2024">
+                            <p:ajax event="change" update="endYear texto" process="@this"/>
+                        </p:inputText>
+
+                        <p:outputLabel for="keywords" value="#{msg['input.keywords']}"/>
+                        <p:inputText id="keywords" value="#{jsonProcessorBean.keywords}" placeholder="Ej: apache,windows,openssl">
+                            <p:ajax event="change" update="keywords texto" process="@this"/>
+                        </p:inputText>
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <!-- Subida de archivos -->
+                <p:fieldset legend="#{msg['upload.section']}">
+                    <h:outputFormat id="texto" styleClass="ui-text-info"
+                                    value="#{msg['upload.info1']}"
+                                    style="margin-bottom:0.3rem; display:block;">
+                        <f:param value="#{jsonProcessorBean.startYearStr}"/>
+                        <f:param value="#{jsonProcessorBean.endYearStr}"/>
+                    </h:outputFormat>
+
+                    <h:outputText value="#{msg['upload.info2']}"
+                                  style="font-style: italic; color: #777; display: block; margin-bottom: 1rem;"/>
+
+                    <p:fileUpload id="jsonFiles"
+                                  mode="advanced"
+                                  multiple="true"
+                                  auto="true"
+                                  dragDropSupport="true"
+                                  maxChunkSize="10485760"
+                                  sequential="true"
+                                  maxRetries="3"
+                                  retryTimeout="5000"
+                                  update="nistForm:growl"
+                                  label="#{msg['upload.info3']}"
+                                  allowTypes="/(\\.|\/)(json)$/"
+                                  listener="#{jsonProcessorBean.handleUpload}"/>
+                </p:fieldset>
+
+                <!-- Acciones -->
+                <p:spacer height="10"/>
+                <p:panelGrid columns="4" styleClass="ui-noborder ui-fluid"
+                             columnClasses="ui-g-12 ui-md-3, ui-g-12 ui-md-3, ui-g-12 ui-md-3, ui-g-12 ui-md-3">
+
+                    <p:commandButton value="#{msg['button.process']}"
+                                     action="#{jsonProcessorBean.process}"
+                                     update="nistForm:logArea nistForm:inlineMessages nistForm:processedPanel"
+                                     oncomplete="if (#{jsonProcessorBean.showDialog}) PF('resultDialog').show();"
+                                     icon="pi pi-cog"
+                                     styleClass="ui-button-success"/>
+
+                    <p:commandButton value="#{msg['button.clear']}"
+                                     action="#{jsonProcessorBean.clear}"
+                                     update="@form"
+                                     icon="pi pi-refresh"
+                                     styleClass="ui-button-secondary"/>
+
+                    <p:commandButton value="#{msg['button.download']}"
+                                     icon="pi pi-download"
+                                     ajax="false"
+                                     styleClass="ui-button-info">
+                        <p:fileDownload value="#{jsonProcessorBean.downloadAllAsZip}"/>
+                    </p:commandButton>
+
+                    <p:messages id="inlineMessages" showDetail="true" closable="true"/>
+                </p:panelGrid>
+
+                <!-- Archivos procesados -->
+                <p:outputPanel id="processedPanel"
+                               rendered="#{jsonProcessorBean.processCompleted}"
+                               styleClass="ui-panel ui-widget ui-widget-content ui-corner-all"
+                               style="margin-top:20px; padding:15px;">
+                    <h3>#{msg['process.finished']}</h3>
+                    <p>#{msg['process.files']}</p>
+                    <ul>
+                        <ui:repeat value="#{jsonProcessorBean.processedFiles}" var="file">
+                            <li><h:outputText value="#{file}"/></li>
+                        </ui:repeat>
+                    </ul>
+                </p:outputPanel>
+            </p:panel>
+
+            <!-- Log del proceso -->
+            <p:spacer height="30"/>
+            <p:panel header="#{msg['log.header']}">
+                <p:inputTextarea id="logArea"
+                                 value="#{jsonProcessorBean.outputLog}"
+                                 rows="15"
+                                 cols="100"
+                                 readonly="true"
+                                 autoResize="false"
+                                 style="width: 100%;"/>
+            </p:panel>
+
+            <!-- Diálogo de éxito -->
+            <p:dialog header="#{msg['dialog.header']}"
+                      widgetVar="resultDialog"
+                      modal="true"
+                      resizable="false"
+                      closable="true"
+                      draggable="false"
+                      visible="#{jsonProcessorBean.showDialog}"
+                      onHide="PF('resultDialog').hide();"
+                      closeOnEscape="true">
+
+                <h:outputText value="#{msg['dialog.message']}"
+                              style="display:block; margin-bottom:1rem;"/>
+
+                <p:commandButton value="#{msg['dialog.download']}"
+                                 icon="pi pi-download"
+                                 ajax="false"
+                                 styleClass="ui-button-success">
+                    <p:fileDownload value="#{jsonProcessorBean.downloadAllAsZip}"/>
+                </p:commandButton>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
